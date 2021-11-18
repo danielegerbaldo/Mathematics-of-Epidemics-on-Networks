@@ -659,7 +659,7 @@ class Simulation_Investigation():
             fakelines.append(plt.Line2D([0,0],[0,1], color=self.sim_color_dict[status], marker = 'o', linestyle = ''))
         
         if self._tex_:
-            ax.legend(fakelines, ['${}$'.format(status) for status in statuses_to_plot])
+            ax.legend(fakelines, ['${}$'.format(status) for status in statuses_to_plot],fontsize=70)
         else:
             ax.legend(fakelines, statuses_to_plot)
 
