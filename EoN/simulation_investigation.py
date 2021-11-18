@@ -275,12 +275,6 @@ class Simulation_Investigation():
             node_times = self._node_history_[node][0]
             node_statuses = self._node_history_[node][1]
             tmin = node_times[0] #should be the same for each node, but hard to choose a single node at start.
-            ## this can happen with contagions on a bipartite
-            ## graph where a subset of nodes do not have an
-            ## infection status
-            if node_statuses[0] not in delta:
-                continue
-
             times.add(tmin)
             delta[node_statuses[0]][tmin]+=1
             for new_status, old_status, time in zip(node_statuses[1:], node_statuses[:-1], node_times[1:]):
@@ -628,10 +622,12 @@ class Simulation_Investigation():
         if nodelist:
             nodeset = set(nodelist) #containment test in next line is quicker with set
             edgelist = [edge for edge in self.G.edges() if edge[0] in nodeset and edge[1] in nodeset]
+            elist, weights = zip(*nx.get_edge_attributes(self.G, 'weight').items()) #set edges lines weight
         else:
             nodelist = list(self.G.nodes())
             random.shuffle(nodelist)#assume no order desired unless sent in
-            edgelist = list(self.G.edges())
+            #edgelist = list(self.G.edges())
+            edgelist, weights = zip(*nx.get_edge_attributes(self.G, 'weight').items()) #set edges lines weight
         if status_order: #redefine nodelist order so that particular status on top
             nodes_by_status = [[node for node in nodelist if nodestatus[node] == status] for status in reversed(status_order)]
             # I_nodes = [node for node in nodelist if nodestatus[node] == 'I']
@@ -641,13 +637,13 @@ class Simulation_Investigation():
                 nodelist.extend(L)
 
         color_list = [self.sim_color_dict[nodestatus[node]] if nodestatus[node] in statuses_to_plot else "None" for node in nodelist]
-
-        nx.draw_networkx_edges(self.G, pos, edgelist=edgelist, ax=ax, **nx_kwargs)
+        
+        nx.draw_networkx_edges(self.G, pos, edgelist=edgelist, ax=ax,edge_color = weights, edge_cmap = plt.cm.Greys, edge_vmin=0.0, edge_vmax=5.0, width=2.0, **nx_kwargs)
         drawn_nodes = nx.draw_networkx_nodes(self.G, pos, nodelist = nodelist, node_color=color_list, ax=ax, **nx_kwargs)
-        if "with_labels" in nx_kwargs and nx_kwargs['with_labels']==True:
-            nx.draw_networkx_labels(self.G, pos)
-        if "with_edge_labels" in nx_kwargs and nx_kwargs['with_edge_labels'] == True:
-            nx.draw_networkx_edge_labels(self.G, pos)
+        #if "with_labels" in nx_kwargs and nx_kwargs['with_labels']==True:
+        nx.draw_networkx_labels(self.G, pos=pos,font_size=30)
+        #if "with_edge_labels" in nx_kwargs and nx_kwargs['with_edge_labels'] == True:
+        #    nx.draw_networkx_edge_labels(self.G, pos)
         ax.set_xticks([])
         ax.set_yticks([])
         
@@ -867,7 +863,7 @@ class Simulation_Investigation():
             fig = plt.figure(figsize=(10,4))
             graph_ax = fig.add_subplot(121)
         else:
-            fig = plt.figure()
+            fig = plt.figure(figsize=(100,100))
             graph_ax = fig.add_subplot(111)
         
         nodestatus = self.get_statuses(self.G, time)
@@ -1009,10 +1005,10 @@ class Simulation_Investigation():
         if ts_plots is None:
             ts_plots = statuses_to_plot
         if ts_plots:
-            fig = plt.figure(figsize=(10,4))
+            fig = plt.figure(figsize=(100,100))
             graph_ax = fig.add_subplot(121)
         else:
-            fig = plt.figure()
+            fig = plt.figure(figsize=(100,100))
             graph_ax = fig.add_subplot(111)
 
         
