@@ -645,7 +645,7 @@ class Simulation_Investigation():
 
         color_list = [self.sim_color_dict[nodestatus[node]] if nodestatus[node] in statuses_to_plot else "None" for node in nodelist]
         
-        nx.draw_networkx_edges(self.G, pos, edgelist=edgelist, ax=ax,edge_color = weights, edge_cmap = plt.cm.Greys, edge_vmin=0.0, edge_vmax=5.0, width=2.0, **nx_kwargs)
+        nx.draw_networkx_edges(self.G, pos, edgelist=edgelist, ax=ax,edge_color = weights, edge_cmap = plt.cm.Greys, edge_vmin=0.0, edge_vmax=5.0, width=2.0,arrowsize=40, **nx_kwargs)
         drawn_nodes = nx.draw_networkx_nodes(self.G, pos, nodelist = nodelist, node_color=color_list, ax=ax, **nx_kwargs)
         #if "with_labels" in nx_kwargs and nx_kwargs['with_labels']==True:
         nx.draw_networkx_labels(self.G, pos=pos,font_size=30)
@@ -912,7 +912,7 @@ class Simulation_Investigation():
 
     def animate(self, frame_times=None, ts_plots = None, 
                 ts_list = None, nodelist=None, status_order=False, timelabel=r'$t$',  
-                pos = None, statuses_to_plot = None, **nx_kwargs):
+                pos = None, statuses_to_plot = None, fig=None,  **nx_kwargs):
         r'''
         
         As in display, but this produces an animation.  
@@ -1012,10 +1012,12 @@ class Simulation_Investigation():
         if ts_plots is None:
             ts_plots = statuses_to_plot
         if ts_plots:
-            fig = plt.figure(figsize=(100,100))
+            if fig is None:
+                fig = plt.figure(figsize=(10,4))
             graph_ax = fig.add_subplot(121)
         else:
-            fig = plt.figure(figsize=(100,100))
+            if fig is None:
+                fig = plt.figure()
             graph_ax = fig.add_subplot(111)
 
         
